@@ -2,11 +2,11 @@ import { BaseObject } from "../Entities/BaseObject";
 import { Linker } from "../Entities/Linker";
 import { Coord } from "../Typings/Coord";
 
-export class Not extends BaseObject {
+export class Wire extends BaseObject {
   coords: Coord[] = [{ x: 0, y: 0 }];
 
   constructor(id: string, linker: Linker) {
-    super(`NOT-${id}`, linker);
+    super(`Wire-${id}`, linker);
 
     this.inPorts = [[`${this.id}-A`, "A", undefined]];
     this.linker.registerInPorts(this.id, [`${this.id}-A`]);
@@ -17,6 +17,6 @@ export class Not extends BaseObject {
 
   action(): void {
     const valueForA = this.inPorts[0][2];
-    this.outPorts[0][2] = Number(!valueForA);
+    this.outPorts[0][2] = valueForA;
   }
 }

@@ -25,6 +25,6 @@ export class Linker {
   }
 
   findOutLinks(targetId: ObjectId): Link[] {
-    return this.links.filter(link => link.out.id === targetId);
+    return this.links.filter((link) => link.out.id === targetId);
   }
 }

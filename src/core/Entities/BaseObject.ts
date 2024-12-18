@@ -17,6 +17,6 @@ export class BaseObject implements IObject {
   }
 
   action(): void {
-    throw new Error('Action missed!');
+    throw new Error("Action missed!");
   }
 }

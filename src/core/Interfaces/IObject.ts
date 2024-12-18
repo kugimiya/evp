@@ -9,4 +9,4 @@ export interface IObject {
   action(): void;
 }
 
-export type ObjectId = IObject['id'];
+export type ObjectId = IObject["id"];

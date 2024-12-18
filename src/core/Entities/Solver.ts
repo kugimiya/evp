@@ -31,7 +31,9 @@ export class Solver {
     const outLinks = this.linker.findOutLinks(rootObject.id);
     outLinks.forEach((outLink) => {
       const outObject = this.linker.objects[outLink.out.id];
-      const outPort = outObject.outPorts.find((port) => port[0] === outLink.out.port);
+      const outPort = outObject.outPorts.find(
+        (port) => port[0] === outLink.out.port,
+      );
 
       if (!outPort) {
         return;
@@ -51,7 +53,7 @@ export class Solver {
           try {
             this.step(inLink.id, deep + 1);
           } catch (e) {
-            console.log('SOLVER: Dead cycle detected, deep =', deep);
+            console.log("SOLVER: Dead cycle detected, deep =", deep);
           }
         }
       });

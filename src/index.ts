@@ -11,9 +11,7 @@ solver.linker.registerLink({
     id: not1.id,
     port: not1.outPorts[0][0],
   },
-  in: [
-    { id: not2.id, port: not2.inPorts[0][0] },
-  ],
+  in: [{ id: not2.id, port: not2.inPorts[0][0] }],
 });
 
 solver.linker.registerLink({
@@ -21,9 +19,7 @@ solver.linker.registerLink({
     id: not2.id,
     port: not2.outPorts[0][0],
   },
-  in: [
-    { id: not3.id, port: not3.inPorts[0][0] },
-  ],
+  in: [{ id: not3.id, port: not3.inPorts[0][0] }],
 });
 
 solver.linker.registerLink({
@@ -31,9 +27,7 @@ solver.linker.registerLink({
     id: not3.id,
     port: not3.outPorts[0][0],
   },
-  in: [
-    { id: not1.id, port: not1.inPorts[0][0] },
-  ],
+  in: [{ id: not1.id, port: not1.inPorts[0][0] }],
 });
 
 const time = Date.now();
