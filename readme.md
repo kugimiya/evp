@@ -1,5 +1,8 @@
 # evp
 
+### Dependencies
+- Bun (JS runtime)
+
 ### Startup
 ```bash
 git clone https://github.com/kugimiya/evp
