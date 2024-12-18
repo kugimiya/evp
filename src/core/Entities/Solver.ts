@@ -1,9 +1,13 @@
 import { nanoid } from "nanoid";
 import { ObjectId } from "../Interfaces/IObject";
+import { Linker } from "./Linker";
 import { And } from "../PredefinedObjects/And";
 import { Const } from "../PredefinedObjects/Const";
 import { Not } from "../PredefinedObjects/Not";
-import { Linker } from "./Linker";
+import { Wire } from "../PredefinedObjects/Wire";
+import { NotOr } from "../PredefinedObjects/NotOr";
+import { Or } from "../PredefinedObjects/Or";
+import { BaseObject } from "./BaseObject";
 
 export class Solver {
   linker: Linker;
@@ -12,16 +16,52 @@ export class Solver {
     this.linker = new Linker();
   }
 
-  addObjectConst(value: number) {
-    return new Const(this.getRandomId(), this.linker, value);
+  addObjectAnd() {
+    const object = new And(this.getRandomId(), this.linker);
+    this.registerObject(object);
+    return object;
   }
 
-  addObjectAnd() {
-    return new And(this.getRandomId(), this.linker);
+  addObjectConst(value: number) {
+    const object = new Const(this.getRandomId(), this.linker, value);
+    this.registerObject(object);
+    return object;
   }
 
   addObjectNot() {
-    return new Not(this.getRandomId(), this.linker);
+    const object = new Not(this.getRandomId(), this.linker);
+    this.registerObject(object);
+    return object;
+  }
+
+  addObjectNotOr() {
+    const object = new NotOr(this.getRandomId(), this.linker);
+    this.registerObject(object);
+    return object;
+  }
+
+  addObjectOr() {
+    const object = new Or(this.getRandomId(), this.linker);
+    this.registerObject(object);
+    return object;
+  }
+
+  addObjectWire() {
+    const object = new Wire(this.getRandomId(), this.linker);
+    this.registerObject(object);
+    return object;
+  }
+
+  registerObject(object: BaseObject): void {
+    this.linker.registerObject(object.id, object);
+    this.linker.registerInPorts(
+      object.id,
+      object.inPorts.map((_) => _[0]),
+    );
+    this.linker.registerOutPorts(
+      object.id,
+      object.outPorts.map((_) => _[0]),
+    );
   }
 
   step(rootObjectId: ObjectId, deep = 0) {
@@ -61,6 +101,6 @@ export class Solver {
   }
 
   private getRandomId(): string {
-    return nanoid(4);
+    return nanoid(8);
   }
 }

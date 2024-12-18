@@ -6,7 +6,7 @@ export class Wire extends BaseObject {
   coords: Coord[] = [{ x: 0, y: 0 }];
 
   constructor(id: string, linker: Linker) {
-    super(`Wire-${id}`, linker);
+    super(`WIRE-${id}`, linker);
 
     this.inPorts = [[`${this.id}-A`, "A", undefined]];
     this.linker.registerInPorts(this.id, [`${this.id}-A`]);

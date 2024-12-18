@@ -8,7 +8,8 @@ export class Const extends BaseObject {
   constructor(id: string, linker: Linker, value: number) {
     super(`CONST-${id}`, linker);
 
-    this.inPorts = [];
+    this.inPorts = [[`${this.id}-U`, "U", value]];
+    this.linker.registerInPorts(this.id, [`${this.id}-U`]);
     this.outPorts = [[`${this.id}-A`, "A", value]];
     this.linker.registerOutPorts(this.id, [`${this.id}-C`]);
   }
