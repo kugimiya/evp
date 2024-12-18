@@ -9,45 +9,57 @@ type SemiSubtractorIO = [
   out2_wire: BaseObject,
 ];
 
-export const createFullSubtractor = (solver: Solver) => {
+export const createFullSubtractor = (solver: Solver, bitsCount = 8) => {
   const rootWire = solver.addObjectWire();
 
   // create operands
-  const operandAIO = createInput([1, 1, 1, 1, 1, 1, 1, 1], solver, rootWire);
-  const operandBIO = createInput([0, 0, 0, 0, 0, 0, 0, 1], solver, rootWire);
+  const operandAIO = createInput(
+    new Array(bitsCount).fill(1),
+    solver,
+    rootWire,
+  );
+  const operandBIO = createInput(
+    new Array(bitsCount).fill(1),
+    solver,
+    rootWire,
+  );
 
   // create output
-  const operandCIO = createOutput([0, 0, 0, 0, 0, 0, 0, 0], solver);
+  const operandCIO = createOutput(new Array(bitsCount).fill(1), solver);
 
-  // create semi summators
-  const semiSubtractor0IO = createSemiSubtractor(solver);
-  const semiSubtractor1IO = createSemiSubtractor(solver);
-  const semiSubtractor2IO = createSemiSubtractor(solver);
-  const semiSubtractor3IO = createSemiSubtractor(solver);
-  const semiSubtractor4IO = createSemiSubtractor(solver);
-  const semiSubtractor5IO = createSemiSubtractor(solver);
-  const semiSubtractor6IO = createSemiSubtractor(solver);
-  const semiSubtractor7IO = createSemiSubtractor(solver);
+  // create semi subtractors
+  const semiSubtractorsIO = new Array<SemiSubtractorIO>(bitsCount);
+  for (let i = 0; i < bitsCount; i++) {
+    semiSubtractorsIO[i] = createSemiSubtractor(solver);
+  }
 
   // link them with operands
-  linkSemiSubtractorsWithOperands(semiSubtractor0IO, operandAIO, operandBIO, operandCIO, 0, 7, solver);
-  linkSemiSubtractorsWithOperands(semiSubtractor1IO, operandAIO, operandBIO, operandCIO, 1, 6, solver);
-  linkSemiSubtractorsWithOperands(semiSubtractor2IO, operandAIO, operandBIO, operandCIO, 2, 5, solver);
-  linkSemiSubtractorsWithOperands(semiSubtractor3IO, operandAIO, operandBIO, operandCIO, 3, 4, solver);
-  linkSemiSubtractorsWithOperands(semiSubtractor4IO, operandAIO, operandBIO, operandCIO, 4, 3, solver);
-  linkSemiSubtractorsWithOperands(semiSubtractor5IO, operandAIO, operandBIO, operandCIO, 5, 2, solver);
-  linkSemiSubtractorsWithOperands(semiSubtractor6IO, operandAIO, operandBIO, operandCIO, 6, 1, solver);
-  linkSemiSubtractorsWithOperands(semiSubtractor7IO, operandAIO, operandBIO, operandCIO, 7, 0, solver);
+  for (let i = 0; i < bitsCount; i++) {
+    linkSemiSubtractorsWithOperands(
+      semiSubtractorsIO[i],
+      operandAIO,
+      operandBIO,
+      operandCIO,
+      i,
+      bitsCount - 1 - i,
+      solver,
+    );
+  }
 
   // then links themselfs
-  linkSemiSubtractorsWithSelfs(semiSubtractor0IO, semiSubtractor1IO, solver);
-  linkSemiSubtractorsWithSelfs(semiSubtractor1IO, semiSubtractor2IO, solver);
-  linkSemiSubtractorsWithSelfs(semiSubtractor2IO, semiSubtractor3IO, solver);
-  linkSemiSubtractorsWithSelfs(semiSubtractor3IO, semiSubtractor4IO, solver);
-  linkSemiSubtractorsWithSelfs(semiSubtractor4IO, semiSubtractor5IO, solver);
-  linkSemiSubtractorsWithSelfs(semiSubtractor5IO, semiSubtractor6IO, solver);
-  linkSemiSubtractorsWithSelfs(semiSubtractor6IO, semiSubtractor7IO, solver);
-  linkSemiSubtractorsWithSelfs(semiSubtractor7IO, semiSubtractor0IO, solver);
+  linkSemiSubtractorsWithSelfs(
+    semiSubtractorsIO[bitsCount - 1],
+    semiSubtractorsIO[0],
+    solver,
+  );
+
+  for (let i = 0; i < bitsCount - 1; i++) {
+    linkSemiSubtractorsWithSelfs(
+      semiSubtractorsIO[i],
+      semiSubtractorsIO[i + 1],
+      solver,
+    );
+  }
 
   return { rootWire, operandAIO, operandBIO, operandCIO };
 };
