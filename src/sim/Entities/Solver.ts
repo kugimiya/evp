@@ -1,4 +1,3 @@
-import { nanoid } from "nanoid";
 import { ObjectId } from "../Interfaces/IObject";
 import { Linker } from "./Linker";
 import { And } from "../PredefinedObjects/And";
@@ -8,6 +7,7 @@ import { Wire } from "../PredefinedObjects/Wire";
 import { NotOr } from "../PredefinedObjects/NotOr";
 import { Or } from "../PredefinedObjects/Or";
 import { BaseObject } from "./BaseObject";
+import { UIObject } from "../../ui/UIObject";
 
 export class Solver {
   linker: Linker;
@@ -16,38 +16,38 @@ export class Solver {
     this.linker = new Linker();
   }
 
-  addObjectAnd() {
-    const object = new And(this.getRandomId(), this.linker);
+  addObjectAnd(uiObject: UIObject) {
+    const object = new And(this.getRandomId(), this.linker, uiObject);
     this.registerObject(object);
     return object;
   }
 
-  addObjectConst(value: number) {
-    const object = new Const(this.getRandomId(), this.linker, value);
+  addObjectConst(value: number, uiObject: UIObject) {
+    const object = new Const(this.getRandomId(), this.linker, value, uiObject);
     this.registerObject(object);
     return object;
   }
 
-  addObjectNot() {
-    const object = new Not(this.getRandomId(), this.linker);
+  addObjectNot(uiObject: UIObject) {
+    const object = new Not(this.getRandomId(), this.linker, uiObject);
     this.registerObject(object);
     return object;
   }
 
-  addObjectNotOr() {
-    const object = new NotOr(this.getRandomId(), this.linker);
+  addObjectNotOr(uiObject: UIObject) {
+    const object = new NotOr(this.getRandomId(), this.linker, uiObject);
     this.registerObject(object);
     return object;
   }
 
-  addObjectOr() {
-    const object = new Or(this.getRandomId(), this.linker);
+  addObjectOr(uiObject: UIObject) {
+    const object = new Or(this.getRandomId(), this.linker, uiObject);
     this.registerObject(object);
     return object;
   }
 
-  addObjectWire() {
-    const object = new Wire(this.getRandomId(), this.linker);
+  addObjectWire(uiObject: UIObject) {
+    const object = new Wire(this.getRandomId(), this.linker, uiObject);
     this.registerObject(object);
     return object;
   }
@@ -69,6 +69,9 @@ export class Solver {
     rootObject.action();
 
     const outLinks = this.linker.findOutLinks(rootObject.id);
+
+    console.log({ rootObjectId, deep });
+
     outLinks.forEach((outLink) => {
       const outObject = this.linker.objects[outLink.out.id];
       const outPort = outObject.outPorts.find(
@@ -89,7 +92,7 @@ export class Solver {
         }
 
         // recurse it
-        if (changed) {
+        if (changed || deep < 10) {
           try {
             this.step(inLink.id, deep + 1);
           } catch (e) {
@@ -101,6 +104,6 @@ export class Solver {
   }
 
   private getRandomId(): string {
-    return nanoid(8);
+    return `${Date.now()}`;
   }
 }

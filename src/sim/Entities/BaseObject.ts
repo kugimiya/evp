@@ -1,3 +1,4 @@
+import { UIObject } from "../../ui/UIObject";
 import { IObject, ObjectId } from "../Interfaces/IObject";
 import { Coord } from "../Typings/Coord";
 import { Port } from "../Typings/Port";
@@ -9,9 +10,11 @@ export class BaseObject implements IObject {
   coords: Coord[] = [];
   inPorts: Port[] = [];
   outPorts: Port[] = [];
+  uiObject: UIObject;
 
-  constructor(id: string, linker: Linker) {
+  constructor(id: string, linker: Linker, uiObject: UIObject) {
     this.id = id;
+    this.uiObject = uiObject;
     this.linker = linker;
     this.linker.registerObject(id, this);
   }

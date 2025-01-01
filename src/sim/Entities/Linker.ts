@@ -1,5 +1,5 @@
 import { IObject, ObjectId } from "../Interfaces/IObject";
-import { Link } from "../typings/Link";
+import { Link } from "../Typings/Link";
 import { PortId } from "../Typings/Port";
 
 export class Linker {

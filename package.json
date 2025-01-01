@@ -1,5 +1,15 @@
 {
+  "name": "evp",
+  "scripts": {
+    "start": "npx ts-node src/index.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
   "dependencies": {
+    "@kmamal/sdl": "^0.10.7",
+    "@types/node": "^22.10.2",
+    "canvas": "^3.0.0",
     "nanoid": "^5.0.9"
   }
 }

@@ -1,12 +1,13 @@
+import { UIObject } from "../../ui/UIObject";
 import { BaseObject } from "../Entities/BaseObject";
 import { Linker } from "../Entities/Linker";
 import { Coord } from "../Typings/Coord";
 
-export class Wire extends BaseObject {
+export class Not extends BaseObject {
   coords: Coord[] = [{ x: 0, y: 0 }];
 
-  constructor(id: string, linker: Linker) {
-    super(`WIRE-${id}`, linker);
+  constructor(id: string, linker: Linker, uiObject: UIObject) {
+    super(`NOT-${id}`, linker, uiObject);
 
     this.inPorts = [[`${this.id}-A`, "A", undefined]];
     this.linker.registerInPorts(this.id, [`${this.id}-A`]);
@@ -17,6 +18,7 @@ export class Wire extends BaseObject {
 
   action(): void {
     const valueForA = this.inPorts[0][2];
-    this.outPorts[0][2] = valueForA;
+    this.outPorts[0][2] = Number(!valueForA);
+    this.uiObject.gateState = this.outPorts[0][2];
   }
 }
