@@ -1,13 +1,5 @@
-import { UIConnector } from "./core/UIConnector";
-import { UIController } from "./core/UIController";
-import { Solver } from "./sim/Entities/Solver";
+import { App } from "./App/App";
 
-const solver = new Solver();
-const ui = new UIConnector();
-const controller = new UIController(ui, solver);
-
-controller.spawnBackground();
-controller.spawnCanvas();
-controller.spawnToolbar();
-
-ui.loop();
+const app = new App();
+app.uiBuilder.buildUI();
+app.uiController.bindUIButtonsHandlers();

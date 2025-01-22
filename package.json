@@ -1,7 +1,10 @@
 {
   "name": "evp",
   "scripts": {
-    "start": "npx ts-node src/index.ts"
+    "start": "npx ts-node src/index.ts",
+    "test:logic_gates": "npx ts-node src/tests/test_logic_gates.ts",
+    "test:ui_primitives": "npx ts-node src/tests/test_ui_primitives.ts",
+    "test:ui_events": "npx ts-node src/tests/test_ui_events.ts"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
