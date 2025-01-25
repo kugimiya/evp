@@ -50,7 +50,7 @@ export class UIGateObject extends PrimitiveRect implements UIGateObjectStatable 
       port.position = UIObjectPosition.Relative;
       port.drawCoordOffset = false;
       port.isHoverableCursor = true;
-      port.applyStyles({ w: 5, h: 5, offsetX: -2.5, offsetY: (this.cellSize * (i + 1)) - 2.5 });
+      port.applyStyles({ w: 8, h: 8, offsetX: -4, offsetY: (this.cellSize * (i + 1)) - 4 });
       port.fillStyle = 'rgb(80, 32, 0)';
       this.inPorts.push(port);
     }
@@ -60,7 +60,7 @@ export class UIGateObject extends PrimitiveRect implements UIGateObjectStatable 
       port.position = UIObjectPosition.Relative;
       port.drawCoordOffset = false;
       port.isHoverableCursor = true;
-      port.applyStyles({ w: 5, h: 5, offsetX: 90 - 2.5, offsetY: (this.cellSize * (i + 1)) - 2.5 });
+      port.applyStyles({ w: 8, h: 8, offsetX: 90 - 4, offsetY: (this.cellSize * (i + 1)) - 4 });
       port.fillStyle = 'rgb(80, 32, 0)';
       this.outPorts.push(port);
     }

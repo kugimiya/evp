@@ -16,6 +16,17 @@ export class LinkedObjectsStoreShape {
   objectsParentMap: Map<LinkedEntity['id'], Set<string>> = new Map();
   forest: TreeNode[] = [];
 
+  deleteObjects(objectIds: LinkedEntity['id'][]): void {
+    this.objects = this.objects
+      .filter((obj) => !objectIds.includes(obj.id))
+      .map((obj) => {
+        obj.childrenIds = obj.childrenIds.filter((childId) => !objectIds.includes(childId));
+        return obj;
+      });
+
+    this.rebuildTree();
+  }
+
   rebuildTree(): void {
     const self = this;
     const hasParent = new Set<string>();
@@ -43,14 +54,23 @@ export class LinkedObjectsStoreShape {
     });
 
     // make tree
-    function buildTree(node: LinkedEntity): TreeNode {
-      return {
+    function buildTree(node: LinkedEntity, visited = new Set<string>()): TreeNode | null {
+      if (visited.has(node.id)) {
+        return null;
+      }
+
+      visited.add(node.id);
+      const treeNode: TreeNode = {
         id: node.id,
         children: node.childrenIds
           .map((childrenId) => self.objectsMap.get(childrenId))
           .filter(Boolean)
-          .map((children) => buildTree(children as LinkedEntity)),
+          .map((children) => buildTree(children as LinkedEntity, visited))
+          .filter(Boolean) as TreeNode[], // Убираем null из результата
       };
+
+      visited.delete(node.id);
+      return treeNode;
     }
 
     const forest: TreeNode[] = [];
@@ -63,7 +83,7 @@ export class LinkedObjectsStoreShape {
 
     this.objectsMap.forEach((obj) => {
       if (!hasParent.has(obj.id)) {
-        forest.push(buildTree(obj));
+        forest.push(buildTree(obj)!);
       }
     });
 
@@ -141,7 +161,12 @@ export class LinkedObjectsStoreShape {
     const self = this;
 
     function traverseNode(node: TreeNode): void {
-      callback(self.objectsMap.get(node.id), node);
+      if (callback) {
+        const obj = self.objectsMap.get(node.id);
+        if (obj) {
+          callback(obj, node);
+        }
+      }
       node.children.forEach(traverseNode);
     }
 
@@ -154,7 +179,12 @@ export class LinkedObjectsStoreShape {
 
     while (nodesToVisit.length > 0) {
       const currentNode = nodesToVisit.shift()!;
-      callback(self.objectsMap.get(currentNode.id), currentNode);
+      if (callback) {
+        const obj = self.objectsMap.get(currentNode.id);
+        if (obj) {
+          callback(obj, currentNode);
+        }
+      }
       nodesToVisit.push(...currentNode.children);
     }
   }

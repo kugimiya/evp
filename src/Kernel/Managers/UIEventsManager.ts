@@ -10,6 +10,8 @@ export class UIEventsManager {
   prevMouseY = 0;
   hoveredUIObjects: Set<string> = new Set();
 
+  shouldFireEvents = true;
+
   constructor(private uiManager: UIManager, private uiObjectsStore: UIObjectsStore) {
     this.uiManager.window.on("mouseMove", this.handleMouseMove.bind(this));
     this.uiManager.window.on("mouseButtonDown", this.handleMouseDown.bind(this));
@@ -27,6 +29,10 @@ export class UIEventsManager {
     const objectsInEvent = this.getTargetSubtree(sdlEvent.x, sdlEvent.y);
 
     objectsInEvent.forEach((uiObject) => {
+      if (!this.shouldFireEvents) {
+        return;
+      }
+
       if (uiEvent.propagationStopped) {
         return;
       }
@@ -61,7 +67,11 @@ export class UIEventsManager {
     needBlur
       .map((uiObjectId) => this.uiObjectsStore.objectsMap.get(uiObjectId) as UIObjectShape)
       .forEach((uiObject) => {
-        if (uiObject.isHoverable) {
+        if (!this.shouldFireEvents) {
+          return;
+        }
+
+        if (uiObject?.isHoverable) {
           uiObject.onBlur(uiEvent);
         }
       });
@@ -69,7 +79,11 @@ export class UIEventsManager {
     needHover
       .map((uiObjectId) => this.uiObjectsStore.objectsMap.get(uiObjectId) as UIObjectShape)
       .forEach((uiObject) => {
-        if (uiObject.isHoverable) {
+        if (!this.shouldFireEvents) {
+          return;
+        }
+
+        if (uiObject?.isHoverable) {
           uiObject.onHover(uiEvent);
         }
       });
@@ -84,6 +98,10 @@ export class UIEventsManager {
     const uiEvent = new EventMouseButton({ x: sdlEvent.x, y: sdlEvent.y, offsetX, offsetY, button: sdlEvent.button });
     const objectsInEvent = this.getTargetSubtree(sdlEvent.x, sdlEvent.y);
     objectsInEvent.forEach((uiObject) => {
+      if (!this.shouldFireEvents) {
+        return;
+      }
+
       if (uiEvent.propagationStopped) {
         return;
       }
@@ -109,6 +127,10 @@ export class UIEventsManager {
 
     // Process MouseUp
     objectsInEvent.forEach((uiObject) => {
+      if (!this.shouldFireEvents) {
+        return;
+      }
+
       if (uiEvent.propagationStopped) {
         return;
       }
@@ -125,6 +147,10 @@ export class UIEventsManager {
     // Process Click
     uiEvent.propagationStopped = false;
     objectsInEvent.forEach((uiObject) => {
+      if (!this.shouldFireEvents) {
+        return;
+      }
+
       if (uiEvent.propagationStopped) {
         return;
       }
@@ -148,6 +174,7 @@ export class UIEventsManager {
 
   getAllObjectsInCoords(x: number, y: number): UIObjectShape[] {
     return this.uiObjectsStore.objects
+      .filter((object) => (object as UIObjectShape)?.isVisible)
       .filter((object) => this.isCoordsInObject(x, y, object as UIObjectShape)) as UIObjectShape[];
   }
 

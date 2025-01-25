@@ -10,59 +10,104 @@ import { App } from "./App";
 import { AppUIBuilder } from "./AppUIBuilder";
 
 export class AppUIController {
+  toolState: 'select' | 'delete' = 'select';
+
   isWirePlacing = false;
   currentWireOutPort: GatePortEntity | undefined = undefined;
 
   constructor(private uiBuilder: AppUIBuilder, private appCore: App, private gateStore: GateObjectsStore) {}
 
   bindUIButtonsHandlers() {
+    const [selectButton, deleteButton] = this.uiBuilder.uiStateButtons;
+
+    selectButton.customHandlers.onClick = (event) => {
+      event.stopPropagation();
+      this.enableSelectTool();
+    };
+
+    deleteButton.customHandlers.onClick = (event) => {
+      event.stopPropagation();
+      this.enableDeleteTool();
+    };
+
     const [andButton, notButton, orButton, norButton, constButton] = this.uiBuilder.gateButtons;
 
     andButton.customHandlers.onClick = (event) => {
+      event.stopPropagation();
       this.enableMovingSpawnedGateEvents(
         this.appCore.kernel.uiObjectsStore.createUIGateObject('AND', 2, 1),
-        event,
         () => this.gateStore.createAndEntity(),
+        (object, gate) => this.bindGateObjectOnClickHandler(object, gate),
       );
     };
 
     notButton.customHandlers.onClick = (event) => {
+      event.stopPropagation();
       this.enableMovingSpawnedGateEvents(
         this.appCore.kernel.uiObjectsStore.createUIGateObject('NOT', 1, 1),
-        event,
         () => this.gateStore.createNotEntity(),
+        (object, gate) => this.bindGateObjectOnClickHandler(object, gate),
       );
     };
 
     orButton.customHandlers.onClick = (event) => {
+      event.stopPropagation();
       this.enableMovingSpawnedGateEvents(
         this.appCore.kernel.uiObjectsStore.createUIGateObject('OR', 2, 1),
-        event,
         () => this.gateStore.createOrEntity(),
+        (object, gate) => this.bindGateObjectOnClickHandler(object, gate),
       );
     };
 
     norButton.customHandlers.onClick = (event) => {
+      event.stopPropagation();
       this.enableMovingSpawnedGateEvents(
         this.appCore.kernel.uiObjectsStore.createUIGateObject('NOR', 2, 1),
-        event,
         () => this.gateStore.createNorEntity(),
+        (object, gate) => this.bindGateObjectOnClickHandler(object, gate),
       );
     };
 
     constButton.customHandlers.onClick = (event) => {
+      event.stopPropagation();
       this.enableMovingSpawnedGateEvents(
         this.appCore.kernel.uiObjectsStore.createUIGateObject('CONST', 0, 1),
-        event,
         () => this.gateStore.createConstEntity(),
-        (object, gate) => {
-          object.isHoverableCursor = true;
-          object.customHandlers.onClick = () => {
-            gate.value = Number(!gate.value);
-          };
-        }
+        (object, gate) => this.bindGateObjectOnClickHandler(object, gate, true),
       );
     };
+  }
+
+  private bindGateObjectOnClickHandler(object: UIGateObject, gate: GateObjectShape, isConstGate = false): void {
+    if (isConstGate) {
+      object.isHoverableCursor = true;
+    }
+
+    object.customHandlers.onClick = () => {
+      if (this.toolState === 'delete') {
+        const [gateInPorts, gateOutPorts] = gate.getPorts();
+        this.appCore.kernel.uiEventsManager.shouldFireEvents = false;
+
+        this.appCore.kernel.gateObjectsStore.deleteObjects(
+          [...gateInPorts.map(_ => ({ id: _[0] })), ...gateOutPorts.map(_ => ({ id: _[0] })), gate]
+            .map(_ => (_ as GateObjectShape).id)
+        );
+
+        this.appCore.kernel.uiObjectsStore.deleteObjects(
+          [...object.inPorts, ...object.outPorts, object.portsWrapper, object.textObject, object]
+            .map(_ => {
+              _.isVisible = false;
+              return _.id;
+            })
+        );
+
+        return;
+      } else {
+        if (isConstGate) {
+          gate.value = Number(!gate.value);
+        }
+      }
+    }
   }
 
   private bindGateObjectPortsHandlers(inPorts: PrimitiveRect[], outPorts: PrimitiveRect[], gateInPorts: GatePortEntity[], gateOutPorts: GatePortEntity[]) {
@@ -79,12 +124,13 @@ export class AppUIController {
             this.uiBuilder.uiCanvas.appendChildren([wireObject]);
             const [wireX, wireY] = this.getPositionInCanvasFromEvent(event);
             wireObject.applyStyles({ x: 0, y: 0, offsetX: wireX, offsetY: wireY, w: 0, h: 0 });
-            wireObject.outPort.applyStyles({ offsetX: 0 - 2.5, offsetY: 0 - 2.5 });
+            wireObject.outPort.applyStyles({ offsetX: 0 - 4, offsetY: 0 - 4 });
 
             const [wireGate, wireInPorts, wireOutPorts] = this.gateStore.createWireEntity();
             wireGate.onGateAction = (gateState) => {
               wireObject.gateState = gateState;
             }
+            wireObject.gateObject = wireGate;
             gateOutPorts[portIndex].appendChildren([wireInPorts[0]]);
             this.currentWireOutPort = wireOutPorts[0];
 
@@ -92,7 +138,7 @@ export class AppUIController {
               subEvent.stopPropagation();
               const [x, y] = this.getPositionInCanvasFromEvent(subEvent);
               wireObject.applyStyles({ w: x - wireX, h: y - wireY });
-              wireObject.outPort.applyStyles({ offsetX: x - wireX - 2.5, offsetY: y - wireY - 2.5 });
+              wireObject.outPort.applyStyles({ offsetX: x - wireX - 4, offsetY: y - wireY - 4 });
             };
 
             this.uiBuilder.uiCanvas.customHandlers.onClick = (subEvent) => {
@@ -121,11 +167,9 @@ export class AppUIController {
 
   private enableMovingSpawnedGateEvents(
     object: UIGateObject,
-    event: IEventMouseButton,
     gateCreator: () => [GateObjectShape, GatePortEntity[], GatePortEntity[]],
     onAfterCreate?: (object: UIGateObject, gate: GateObjectShape) => void,
   ) {
-    event.stopPropagation();
     this.uiBuilder.uiCanvas.appendChildren([object]);
     object.position = UIObjectPosition.AbsoluteInternal;
 
@@ -145,12 +189,23 @@ export class AppUIController {
       gate.onGateAction = (gateState) => {
         object.gateState = gateState;
       }
+      object.gateObject = gate;
 
       this.bindGateObjectPortsHandlers(object.inPorts, object.outPorts, gateInPorts, gateOutPorts);
       if (onAfterCreate) {
         onAfterCreate(object, gate);
       }
     }
+  }
+
+  private enableSelectTool() {
+    this.toolState = 'select';
+    this.uiBuilder.uiCanvas.customHandlers.onClick = undefined;
+  }
+
+  private enableDeleteTool() {
+    this.toolState = 'delete';
+    this.uiBuilder.uiCanvas.customHandlers.onClick = undefined;
   }
 
   private getPositionInCanvasFromEvent(event: IEventMouseButton | IEventMouseMove, object?: UIObjectShape) {

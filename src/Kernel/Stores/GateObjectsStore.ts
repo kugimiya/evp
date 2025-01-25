@@ -24,7 +24,9 @@ export class GateObjectsStore extends LinkedObjectsStoreShape {
     if (mode === 'BFS') {
       this.traverseBFS((entity) => {
         if (entity) {
-          (entity as GateObjectShape).action();
+          if ((entity as GateObjectShape).action) {
+            (entity as GateObjectShape).action();
+          }
         }
       });
     }
@@ -32,7 +34,9 @@ export class GateObjectsStore extends LinkedObjectsStoreShape {
     if (mode === 'DFS') {
       this.traverseDFS((entity) => {
         if (entity) {
-          (entity as GateObjectShape).action();
+          if ((entity as GateObjectShape).action) {
+            (entity as GateObjectShape).action();
+          }
         }
       });
     }

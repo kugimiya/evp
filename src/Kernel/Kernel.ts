@@ -25,8 +25,18 @@ export class Kernel {
     }, Math.round(1000 / simTicksPerSecond));
 
     while (!this.uiManager.window.destroyed) {
-      this.uiManager.draw(this.uiObjectsStore);
-      await setTimeout(0);
+      try {
+        if (!this.uiEventsManager.shouldFireEvents) {
+          this.uiObjectsStore.rebuildTree();
+          await setTimeout(100);
+          this.uiEventsManager.shouldFireEvents = true;
+        } else {
+          this.uiManager.draw(this.uiObjectsStore);
+        }
+        await setTimeout(0);
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     clearInterval(intervalPointer);

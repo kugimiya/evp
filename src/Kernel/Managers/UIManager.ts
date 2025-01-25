@@ -47,8 +47,8 @@ export class UIManager {
         let prevY = target.y + target.offsetY + target.paddingY;
 
         if (target.layout === UIObjectLayout.FlexHorizontal) {
-          children.forEach((child, childIndex) => {
-            const [childW] = child.calcDynamicWH();
+          children.filter((child) => child?.calcDynamicWH !== undefined).forEach((child, childIndex) => {
+            const [childW] = child?.calcDynamicWH() || [0, 0];
             children[childIndex].x = prevX;
             children[childIndex].y = prevY;
 
@@ -57,8 +57,8 @@ export class UIManager {
         }
 
         if (target.layout === UIObjectLayout.FlexVertical) {
-          children.forEach((child, childIndex) => {
-            const [_childW, childH] = child.calcDynamicWH();
+          children.filter((child) => child?.calcDynamicWH !== undefined).forEach((child, childIndex) => {
+            const [_childW, childH] = child?.calcDynamicWH() || [0, 0];
             children[childIndex].x = prevX;
             children[childIndex].y = prevY;
 
@@ -80,8 +80,8 @@ export class UIManager {
         }
 
         if (parent.layout === UIObjectLayout.Centered) {
-          const [parentW, parentH] = parent.calcDynamicWH();
-          const [targetW, targetH] = target.calcDynamicWH();
+          const [parentW, parentH] = parent?.calcDynamicWH ? parent?.calcDynamicWH() : [0, 0];
+          const [targetW, targetH] = target?.calcDynamicWH ? target?.calcDynamicWH() : [0, 0];
 
           target.x = (parent.x + parent.offsetX) + ((parentW / 2) - (targetW / 2));
           target.y = (parent.y + parent.offsetY) + ((parentH / 2) - (targetH / 2));
@@ -97,8 +97,9 @@ export class UIManager {
 
   private renderUIObjects(uiObjectsStore: UIObjectsStore) {
     uiObjectsStore.traverseDFS((uiObject) => {
-      if (uiObject) {
-        (uiObject as UIObjectShape).draw();
+      const casted = uiObject as UIObjectShape | undefined;
+      if (casted?.isVisible && casted?.draw) {
+        casted.draw();
       }
     });
   }

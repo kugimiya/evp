@@ -18,6 +18,7 @@ export const UI_OBJECTS_LABELS = {
   UI_CANVAS: 'UI_CANVAS',
   UI_GATE_OBJECT: 'UI_GATE_OBJECT',
   UI_GATE_WIRE: 'UI_GATE_WIRE',
+  UI_GATE_TEXT: 'UI_GATE_TEXT',
 };
 
 export class UIObjectsStore extends LinkedObjectsStoreShape {
@@ -62,7 +63,7 @@ export class UIObjectsStore extends LinkedObjectsStoreShape {
   }
 
   createUIGateObject(gateText: string, inPortCount: number, outPortCount: number) {
-    const obj = new UIGateObject(this.getRandomId(UI_OBJECTS_LABELS.UI_BUTTON), this.getRandomId(UI_OBJECTS_LABELS.UI_BUTTON_TEXT), this, this.ctx, {});
+    const obj = new UIGateObject(this.getRandomId(UI_OBJECTS_LABELS.UI_GATE_OBJECT), this.getRandomId(UI_OBJECTS_LABELS.UI_GATE_TEXT), this, this.ctx, {});
     obj.position = UIObjectPosition.AbsoluteInternal;
     obj.applySettings(gateText, inPortCount, outPortCount);
     [obj, obj.textObject, obj.portsWrapper, ...obj.inPorts, ...obj.outPorts].forEach((subObj) => {

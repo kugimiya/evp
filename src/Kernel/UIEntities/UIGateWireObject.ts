@@ -28,14 +28,14 @@ export class UIGateWireObject extends PrimitiveLine {
     this.inPort.position = UIObjectPosition.Relative;
     this.inPort.drawCoordOffset = false;
     this.inPort.isHoverableCursor = true;
-    this.inPort.applyStyles({ w: 5, h: 5, offsetX: -2.5, offsetY: -2.5 });
+    this.inPort.applyStyles({ w: 8, h: 8, offsetX: -4, offsetY: -4 });
     this.inPort.fillStyle = 'rgb(80, 32, 0)';
 
     this.outPort = new PrimitiveRect(this.objectsStore.getRandomId(`OUT-PORT-0`), this.objectsStore, this.ctx, {});
     this.outPort.position = UIObjectPosition.Relative;
     this.outPort.drawCoordOffset = false;
     this.outPort.isHoverableCursor = true;
-    this.outPort.applyStyles({ w: 5, h: 5, offsetX: -2.5, offsetY: -2.5 });
+    this.outPort.applyStyles({ w: 8, h: 8, offsetX: -4, offsetY: -4 });
     this.outPort.fillStyle = 'rgb(80, 32, 0)';
 
     this.appendChildren([this.inPort, this.outPort]);

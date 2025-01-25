@@ -8,6 +8,7 @@ import { LinkedEntityShape } from "./LinkedEntityShape";
 import { LinkedObjectsStoreShape } from "./LinkedObjectsStoreShape";
 import { UIObjectPainting } from "../Interfaces/UIObjectPainting";
 import { IEventMouseButton, IEventMouseMove } from "../Interfaces/UIEvent";
+import { GateObjectShape } from "./GateObjectShape";
 
 export abstract class UIObjectShape extends LinkedEntityShape implements LinkedEntity, UIObjectEventing, UIObjectLayouting, UIObjectPainting {
   constructor(
@@ -18,6 +19,9 @@ export abstract class UIObjectShape extends LinkedEntityShape implements LinkedE
   ) {
     super(id, objectsStore);
   }
+
+  // linking
+  gateObject?: GateObjectShape = undefined;
 
   // painting
   abstract draw(): void;
