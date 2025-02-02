@@ -26,4 +26,5 @@ export interface UIObjectEventing extends UIObjectEventHandlers {
   isClickable: boolean;
 
   customHandlers: Partial<UIObjectEventHandlers>;
+  hoverPredicator: (x: number, y: number) => boolean;
 }

@@ -4,6 +4,7 @@ export interface UIObjectLayoutingBase {
   position: UIObjectPosition;
   layout: UIObjectLayout;
   isVisible: boolean;
+  drawCoordOffset: boolean;
 
   x: number;
   y: number;

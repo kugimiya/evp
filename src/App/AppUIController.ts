@@ -3,6 +3,7 @@ import { GatePortEntity } from "../Kernel/GateEntities/GatePortEntity";
 import { GateObjectsStore } from "../Kernel/Stores/GateObjectsStore";
 import { PrimitiveRect } from "../Kernel/UIEntities/PrimitiveRect";
 import { UIGateObject } from "../Kernel/UIEntities/UIGateObject";
+import { UIGateWireObject } from "../Kernel/UIEntities/UIGateWireObject";
 import { GateObjectShape } from "../Shapes/GateObjectShape";
 import { UIObjectShape } from "../Shapes/UIObjectShape";
 import { UIObjectPosition } from "../Typings/UIObject";
@@ -86,7 +87,6 @@ export class AppUIController {
     object.customHandlers.onClick = () => {
       if (this.toolState === 'delete') {
         const [gateInPorts, gateOutPorts] = gate.getPorts();
-        this.appCore.kernel.uiEventsManager.shouldFireEvents = false;
 
         this.appCore.kernel.gateObjectsStore.deleteObjects(
           [...gateInPorts.map(_ => ({ id: _[0] })), ...gateOutPorts.map(_ => ({ id: _[0] })), gate]
@@ -107,6 +107,31 @@ export class AppUIController {
           gate.value = Number(!gate.value);
         }
       }
+    }
+  }
+
+  private bindWireGateObjectOnClickHandler(object: UIGateWireObject, gate: GateObjectShape): void {
+    object.customHandlers.onClick = () => {
+      if (this.toolState !== 'delete') {
+        return;
+      }
+
+      const [gateInPorts, gateOutPorts] = gate.getPorts();
+
+      this.appCore.kernel.gateObjectsStore.deleteObjects(
+        [...gateInPorts.map(_ => ({ id: _[0] })), ...gateOutPorts.map(_ => ({ id: _[0] })), gate]
+          .map(_ => (_ as GateObjectShape).id)
+      );
+
+      this.appCore.kernel.uiObjectsStore.deleteObjects(
+        [object.inPort, object.outPort, object]
+          .map(_ => {
+            _.isVisible = false;
+            return _.id;
+          })
+      );
+
+      return;
     }
   }
 
@@ -133,6 +158,8 @@ export class AppUIController {
             wireObject.gateObject = wireGate;
             gateOutPorts[portIndex].appendChildren([wireInPorts[0]]);
             this.currentWireOutPort = wireOutPorts[0];
+
+            this.bindWireGateObjectOnClickHandler(wireObject, wireGate);
 
             this.uiBuilder.uiCanvas.customHandlers.onMouseMove = (subEvent) => {
               subEvent.stopPropagation();

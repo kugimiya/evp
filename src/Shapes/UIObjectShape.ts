@@ -27,6 +27,7 @@ export abstract class UIObjectShape extends LinkedEntityShape implements LinkedE
   abstract draw(): void;
 
   // layouting
+  drawCoordOffset = false;
   position = UIObjectPosition.Absolute;
   layout = UIObjectLayout.Static;
   isVisible = true;
@@ -64,6 +65,19 @@ export abstract class UIObjectShape extends LinkedEntityShape implements LinkedE
   isMouseMovable = true;
   isMouseDownable = true;
   isClickable = true;
+
+  hoverPredicator(x: number, y: number): boolean {
+    const x1 = this.x + (this.drawCoordOffset ? this.offsetX : 0);
+    const y1 = this.y + (this.drawCoordOffset ? this.offsetY : 0);
+    const x2 = this.x + this.w + (this.drawCoordOffset ? this.offsetX : 0);
+    const y2 = this.y + this.h + (this.drawCoordOffset ? this.offsetY : 0);
+
+    return (
+      ((x > x1) && (x < x2))
+      &&
+      ((y > y1) && (y < y2))
+    );
+  };
 
   onDelete() {}
 

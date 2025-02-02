@@ -10,6 +10,7 @@ export class UIGateWireObject extends PrimitiveLine {
   outPort: PrimitiveRect;
 
   fillStyle = 'rgb(175, 200, 200)';
+  fillStyleHovered = 'rgb(175, 175, 175)';
   lineWidth = 2.5;
   cellSize = 15;
 

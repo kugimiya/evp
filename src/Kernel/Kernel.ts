@@ -26,13 +26,7 @@ export class Kernel {
 
     while (!this.uiManager.window.destroyed) {
       try {
-        if (!this.uiEventsManager.shouldFireEvents) {
-          this.uiObjectsStore.rebuildTree();
-          await setTimeout(100);
-          this.uiEventsManager.shouldFireEvents = true;
-        } else {
-          this.uiManager.draw(this.uiObjectsStore);
-        }
+        this.uiManager.draw(this.uiObjectsStore);
         await setTimeout(0);
       } catch (e) {
         console.error(e);
